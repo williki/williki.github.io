@@ -3,6 +3,7 @@
 get_config_repo() {
 	echo "Downloading and installing dotfiles..."
 	git clone https://github.com/williki/configs.git
+	mkdir -p .config/htop
 	mv -i configs/htoprc ~/.config/htop/htoprc
 	mv -i configs/.zshrc ~
 	mv -i configs/.vimrc ~
@@ -11,7 +12,7 @@ get_config_repo() {
 # Arch based OS
 if [ -f /usr/bin/pacman ]; then
 	echo "Arch based OS detected, installing core progs..."
-	sudo pacman -Sy --noconfirm binutils curl git htop vim zsh sudo
+	sudo pacman -Syu --noconfirm binutils curl git htop vim zsh sudo
 	# to make pacaur work...
 	sudo pacman -S --asdeps --noconfirm fakeroot expac
 	# to build C programs
@@ -32,6 +33,7 @@ fi
 # Redhat based OS
 if [ -f /usr/bin/dnf ]; then
 	echo "Redhat based OS detected, installing core progs..."
+	sudo dnf update
 	sudo dnf install git htop vim zsh
 fi
 
