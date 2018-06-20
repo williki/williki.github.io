@@ -1,42 +1,53 @@
 #!/bin/sh
 
+check_root() {
+	if [[ $EUID -ne 0 ]]; then
+		echo "This script must be run as root"
+		exit 1
+	fi
+}
+
 get_config_repo() {
 	echo "Downloading and installing dotfiles..."
 	git clone https://github.com/williki/configs.git
-	mkdir -p .config/htop
+	mkdir -p ~/.config/htop
 	mv -i configs/htoprc ~/.config/htop/htoprc
 	mv -i configs/.zshrc ~
 	mv -i configs/.vimrc ~
+	rm -r configs
 }
 
-# Arch based OS
-if [ -f /usr/bin/pacman ]; then
-	echo "Arch based OS detected, installing core progs..."
-	sudo pacman -Syu --noconfirm binutils curl git htop vim zsh sudo
-	# to make pacaur work...
-	sudo pacman -S --asdeps --noconfirm fakeroot expac
-	# to build C programs
-	sudo pacman -S --noconfirm gcc make
-	curl -O https://raw.githubusercontent.com/rmarquis/pacaur/master/pacaur	
-	chmod a+x pacaur
-	./pacaur -S --noconfirm pacaur
-	rm pacaur
-fi
+install_core_progs() {
+	
+	# Arch based OS
+	if [ -f /usr/bin/pacman ]; then
+		echo "Arch based OS detected, installing core progs..."
+		pacman -Syu --noconfirm curl git htop vim zsh base-devel
+		git clone https://aur.archlinux.org/yay.git
+		cd yay
+		yes | makepkg -si
+		cd ..
+		rm -rf yay
+	fi
 
-# Debian based OS
-if [ -f /usr/bin/apt-get ]; then
-	echo "Debian based OS detected, installing core progs..."
-	sudo apt-get -y update
-	sudo apt-get -y install git htop vim zsh
-fi
+	# Debian based OS
+	if [ -f /usr/bin/apt-get ]; then
+		echo "Debian based OS detected, installing core progs..."
+		sudo apt-get -y update
+		sudo apt-get -y install git htop vim zsh
+	fi
 
-# Redhat based OS
-if [ -f /usr/bin/dnf ]; then
-	echo "Redhat based OS detected, installing core progs..."
-	sudo dnf update
-	sudo dnf install git htop vim zsh
-fi
+	# Redhat based OS
+	if [ -f /usr/bin/dnf ]; then
+		echo "Redhat based OS detected, installing core progs..."
+		sudo dnf update
+		sudo dnf install git htop vim zsh
+	fi
+}
 
+# BEGIN
+check_root
+install_core_progs
 get_config_repo
 
 echo "All done, have a nice day!"
