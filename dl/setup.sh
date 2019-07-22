@@ -1,8 +1,8 @@
 #!/bin/sh
 
 check_root() {
-	if [[ $EUID -ne 0 ]]; then
-		echo "This script must be run as root"
+	if [[ $EUID -eq 0 ]]; then
+		echo "This script must *not* be run as root!"
 		exit 1
 	fi
 }
@@ -14,7 +14,7 @@ get_config_repo() {
 	mv -i configs/htoprc ~/.config/htop/htoprc
 	mv -i configs/.zshrc ~
 	mv -i configs/.vimrc ~
-	rm -r configs
+	rm -rf configs
 }
 
 install_core_progs() {
@@ -22,7 +22,7 @@ install_core_progs() {
 	# Arch based OS
 	if [ -f /usr/bin/pacman ]; then
 		echo "Arch based OS detected, installing core progs..."
-		pacman -Syu --noconfirm curl git htop vim zsh base-devel
+		sudo pacman -Syu --noconfirm binutils curl git htop vim zsh zsh-autosuggestions zsh-syntax-highlightning base-devel
 		git clone https://aur.archlinux.org/yay.git
 		cd yay
 		yes | makepkg -si
