@@ -13,6 +13,7 @@ get_config_repo() {
 	mkdir -p ~/.config/htop
 	mv -i configs/.config/htop/htoprc ~/.config/htop/htoprc
 	mv -i configs/.zshrc ~
+	mv -i configs/.zsh ~
 	mv -i configs/.vimrc ~
 	rm -rf configs
 }
